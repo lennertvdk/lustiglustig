@@ -14,7 +14,32 @@
   @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-40px); } }
   @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
   @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-  @keyframes float { 0% { transform: translate(0,0); } 50% { transform: translate(20px,-30px); } 100% { transform: translate(0,0); } }
+  @keyframes tickerscroll {
+    0% { transform: translateX(20%); }
+    100% { transform: translateX(-100%); }
+  }
+  @keyframes float {
+    0%   { transform: translate(calc(0px + var(--dx, 0px)), calc(0px + var(--dy, 0px))); }
+    50%  { transform: translate(calc(20px + var(--dx, 0px)), calc(-30px + var(--dy, 0px))); }
+    100% { transform: translate(calc(0px + var(--dx, 0px)), calc(0px + var(--dy, 0px))); }
+  }
+  @keyframes chaosspin {
+    0%   { transform: rotate(0deg) scale(1); filter: none; }
+    15%  { transform: rotate(25deg) scale(1.05); filter: hue-rotate(60deg); }
+    35%  { transform: rotate(-200deg) scale(0.92); filter: hue-rotate(180deg) saturate(2); }
+    55%  { transform: rotate(280deg) scale(1.08); filter: hue-rotate(280deg); }
+    75%  { transform: rotate(-40deg) scale(0.96); filter: hue-rotate(360deg); }
+    100% { transform: rotate(0deg) scale(1); filter: none; }
+  }
+  body.chaos-spin { animation: chaosspin 3.2s ease-in-out, rainbowbg 12s ease infinite; transform-origin: center center; }
+  body.chaos-spin.chaos-panic { animation-duration: 1s, 12s; }
+
+  @keyframes zoomreveal {
+    0%   { transform: scale(0.01); }
+    70%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  body.chaos-zoom { animation: zoomreveal 0.7s cubic-bezier(.2,.9,.3,1) both, rainbowbg 12s ease infinite; transform-origin: center center; }
 
   html, body {
     margin: 0;
@@ -26,7 +51,7 @@
     color: #1a0033;
     overflow-x: hidden;
     text-align: center;
-    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' font-size='24'><text y='24'>🌈</text></svg>") 16 16, auto;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' font-size='24'><text y='24'>😂</text></svg>") 16 16, auto;
   }
 
   h1 {
@@ -93,6 +118,20 @@
   }
 
   footer { padding: 40px; font-size: 1rem; }
+
+  .meme-float {
+    position: fixed;
+    width: 180px;
+    z-index: 1;
+    border: 3px solid #000;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 1.5s ease, filter 0.3s ease;
+  }
+  .meme-float:hover { filter: brightness(1.3) saturate(1.5); }
+  .meme-float img { display: block; width: 100%; height: auto; border-radius: 7px; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -101,6 +140,8 @@
   <span class="float2">🐱</span>
   <span class="float3">☮️</span>
   <span class="float4">🌻</span>
+
+  <button id="music-toggle" style="position:fixed; top:16px; left:16px; z-index:99996; font-size:1rem; padding:10px 16px; animation:wiggle 1.6s infinite;">🔇 MUSIK AN</button>
 
   <h1>~*~ LUSTIG LUSTIG ~*~</h1>
   <p class="blink">🚧 DIESE SEITE IST NIEMALS FERTIG UND DAS IST GUT SO 🚧</p>
@@ -131,19 +172,167 @@
     <h2 class="meme">PEACE. LOVE. ORGELPUNKT.</h2>
     <p>Diese Seite existiert aus reiner, unkontrollierter Freude und ist mit Absicht komplett übertrieben.<br />
     Für die ernsthafte, seriöse, erwachsene Version bitte hier entlang: <br />
-    <a href="https://nlustig.netlify.app" style="color:#a200ff; font-weight:bold;">nlustig.netlify.app 🧐</a></p>
+    <a id="serious-link" href="https://nlustig.netlify.app" style="color:#a200ff; font-weight:bold;">nlustig.netlify.app 🧐</a></p>
+  </div>
+
+  <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100000; align-items:center; justify-content:center;">
+    <div id="modal-box" style="position:relative; background:#fff; border:6px solid #000; border-radius:16px; max-width:420px; padding:30px; font-family:Georgia,serif; color:#111; box-shadow:0 0 0 8px #eee;">
+      <button id="modal-close" aria-label="Schließen" style="position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%; border:2px solid #000; background:#eee; font-size:1.1rem; line-height:1; cursor:pointer; animation:none; padding:0;">✕</button>
+      <p style="font-size:1.1rem; line-height:1.5;">⚠️ Sie verlassen jetzt den seriösen, professionellen Bereich der Kirchenmusik.</p>
+      <p style="font-size:0.95rem; color:#555;">Bitte bestätigen Sie, dass Sie bereit für absolute Ernsthaftigkeit sind.</p>
+      <p style="font-size:1.05rem; color:#111; margin-top:16px; padding:10px; background:#f0f0f0; border:2px dashed #999; border-radius:8px;">➡️ Weiterleitung zu <strong style="font-size:1.15rem;">nlustig.netlify.app</strong></p>
+      <button id="modal-confirm" style="margin-top:10px; font-family:Georgia,serif; font-size:1rem; padding:10px 20px; border-radius:6px; border:2px solid #000; background:#eee; cursor:pointer; animation:none;">Ja, ich bin bereit.</button>
+    </div>
   </div>
 
   <button onclick="party()">🎉 NOCH MEHR CHAOS 🎉</button>
 
-  <footer>
-    made with 🌈, 🐱 and zero Ernsthaftigkeit &middot; © <span id="year"></span> Lustig Lustig
-  </footer>
+  <div class="box" style="border-color:#a200ff;">
+    <h2 style="color:#a200ff;">🧘 ORGEL-TANTRA WORKSHOP BEI NIKLAS UNLUSTIG</h2>
+    <p>Ein Wochenende, dein Gong. Du, ich, dein Gong und meine Pfeife.<br />
+    Lerne, deine innere Kadenz zu finden &mdash; ganz ohne Auflösung, dafür mit viel Registerzug.<br />
+    Inklusive: 3x Räucherstäbchen, 1x Klangschale, und <strong style="font-size:1.2em; color:#a200ff;">eine wirklich, wirklich große Pfeife 🍆🔔 für deinen mächtigen Gong 🍑</strong>.</p>
+    <p class="doge">much chakra. very atmen. so beckenboden. wow lange pfeife. so groß. wow spirituell 🕉️🧘‍♂️✨</p>
+    <p style="font-size:0.85rem; color:#666;">💰 Zahlung akzeptiert in: Bargeld, Kollekte, ₿ Bitcoin (Kurs schwankt mit dem Gong)</p>
+    <button id="tantra-btn">🕉️ Jetzt (wirklich) buchen</button>
+    <p id="tantra-result" style="font-weight:bold; min-height:1.5em;"></p>
+  </div>
+
+  <div id="captcha-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100000; align-items:center; justify-content:center;">
+    <div id="captcha-box" class="box" style="position:relative; border-color:#00c9ff; max-width:480px; margin:0;">
+      <button id="captcha-close" aria-label="Schließen" style="position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%; border:2px solid #000; background:#eee; font-size:1.1rem; line-height:1; cursor:pointer; animation:none; padding:0;">✕</button>
+      <h2 style="color:#00c9ff;">🤖 SICHERHEITSÜBERPRÜFUNG ERFORDERLICH</h2>
+      <p>Um zur ernsthaften Seite zu gelangen, beweisen Sie bitte, dass Sie kein Pfarrer im Tarnanzug sind:</p>
+      <button id="captcha-btn">☑️ Ich bin definitiv ein Mensch (und liebe Orgeln)</button>
+      <p id="captcha-result" style="font-weight:bold; min-height:1.5em;"></p>
+    </div>
+  </div>
+
+  <div id="cookie-banner" style="position:fixed; bottom:50px; left:0; right:0; background:#111; color:#fff; padding:18px; z-index:99998; display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:center; font-family:Georgia,serif; border-top:4px solid #ffea00;">
+    <span>🍪 Diese Seite verwendet echte, physische Kekse. Kein Widerspruchsrecht.</span>
+    <button id="cookie-accept" style="padding:8px 16px; border-radius:6px; border:none; background:#ffea00; font-weight:bold; cursor:pointer;">Alle Kekse essen 🍪</button>
+  </div>
+
+  <div id="achievement" style="position:fixed; top:20px; right:-400px; background:#111; color:#ffea00; padding:14px 20px; border-radius:10px; border:2px solid #ffea00; font-family:Georgia,serif; z-index:99997; transition: right 0.5s ease; box-shadow:0 0 20px rgba(255,234,0,0.5);">
+    🏆 <span id="achievement-text">Achievement freigeschaltet!</span>
+  </div>
+
+  <div id="ticker-bar" style="position:fixed; left:0; right:0; bottom:0; display:flex; align-items:stretch; font-family:Impact, sans-serif; overflow:hidden; border-top:4px solid #fff; z-index:99990; height:50px;">
+    <div style="background:#cc0000; color:#fff; padding:12px 20px; white-space:nowrap; letter-spacing:1px; z-index:2; box-shadow:6px 0 12px rgba(0,0,0,0.4);">
+      🔴 BREAKING NEWS
+    </div>
+    <div style="background:#000; flex:1; overflow:hidden; position:relative;">
+      <div id="news-ticker" style="position:absolute; top:0; left:0; white-space:nowrap; color:#ffea00; padding:12px 0; font-size:1.1rem; animation: tickerscroll 110s linear infinite;">
+        🎹 ORGANIST ENTDECKT: PEDAL IST AUCH NUR EIN KLAVIER FÜR FÜSSE &nbsp;&nbsp;•&nbsp;&nbsp;
+        🎶 EXPERTEN WARNEN: ZU VIEL PÄRT KANN ZU INNERER RUHE FÜHREN &nbsp;&nbsp;•&nbsp;&nbsp;
+        🐈 KATZE LEGT SICH AUF MANUAL, KONZERT MUSS TRANSPONIERT WERDEN &nbsp;&nbsp;•&nbsp;&nbsp;
+        📯 CHORLEITER FORDERT: "ATMET WENIGSTENS GEMEINSAM FALSCH" &nbsp;&nbsp;•&nbsp;&nbsp;
+        🕯️ GOTTESDIENST VERLÄNGERT SICH UM 3 ZUGABEN &nbsp;&nbsp;•&nbsp;&nbsp;
+        🎵 WISSENSCHAFT BESTÄTIGT: MOLL KLINGT TRAURIGER ALS DUR &nbsp;&nbsp;•&nbsp;&nbsp;
+        🚨 EILMELDUNG: DIESE WEBSITE HAT KEINE ERNSTHAFTE ABSICHT &nbsp;&nbsp;•&nbsp;&nbsp;
+        ₿ ORGELCOIN (ORG) STEIGT UM 420% NACH EINEM GUTEN PLENUM-EINSATZ &nbsp;&nbsp;•&nbsp;&nbsp;
+      </div>
+    </div>
+    <div style="background:#111; color:#888; padding:12px 16px; white-space:nowrap; font-family:Georgia,serif; font-size:0.8rem; border-left:2px solid #333; display:flex; align-items:center;">
+      © <span id="year"></span> Lustig Lustig
+    </div>
+  </div>
+
+  <p style="padding: 20px 20px 70px; font-size: 0.9rem;">made with 🌈, 🐱 and zero Ernsthaftigkeit</p>
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // background music via the official YouTube embed player (plays through
+    // YouTube's own player/ads, not a ripped/copied audio file)
+    let musicOn = false;
+    let nowPlayingWidget = null;
+    let nowPlayingMinimized = false;
+    const musicBtn = document.getElementById('music-toggle');
+    const YOUTUBE_VIDEO_ID = 'QB15JltRf-M';
+
+    function startMusic() {
+      nowPlayingWidget = document.createElement('div');
+      nowPlayingWidget.id = 'now-playing';
+      nowPlayingWidget.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99995;
+        background:#111; border: 4px solid #ffea00; border-radius: 14px;
+        font-family: Georgia, serif; color: #fff; overflow: hidden;
+        box-shadow: 0 0 60px rgba(255,234,0,0.6); width: min(90vw, 720px);
+      `;
+      nowPlayingWidget.innerHTML = `
+        <div id="now-playing-bar" style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#000; cursor:move; user-select:none;">
+          <span style="font-size:1.1rem;">🎵 Jetzt läuft: Polyphia – Can You Feel It</span>
+          <span style="display:flex; gap:10px;">
+            <button id="now-playing-min" title="Minimieren" style="all:unset; cursor:pointer; font-size:1.2rem; padding:2px 8px;">➖</button>
+            <button id="now-playing-close" title="Schließen" style="all:unset; cursor:pointer; font-size:1.2rem; padding:2px 8px;">✕</button>
+          </span>
+        </div>
+        <div id="now-playing-video">
+          <iframe width="100%" height="405" style="display:block; border:0;"
+            src="https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&start=3"
+            allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+      `;
+      document.body.appendChild(nowPlayingWidget);
+
+      document.getElementById('now-playing-close').addEventListener('click', () => {
+        musicOn = false;
+        stopMusic();
+        musicBtn.textContent = '🔇 MUSIK AN';
+      });
+      document.getElementById('now-playing-min').addEventListener('click', () => {
+        nowPlayingMinimized = !nowPlayingMinimized;
+        document.getElementById('now-playing-video').style.display = nowPlayingMinimized ? 'none' : 'block';
+      });
+
+      // draggable by its header bar
+      const bar = document.getElementById('now-playing-bar');
+      let dragging = false, offsetX = 0, offsetY = 0;
+      bar.addEventListener('mousedown', (e) => {
+        if (e.target.closest('button')) return;
+        dragging = true;
+        const rect = nowPlayingWidget.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        nowPlayingWidget.style.transform = 'none';
+        nowPlayingWidget.style.left = rect.left + 'px';
+        nowPlayingWidget.style.top = rect.top + 'px';
+      });
+      document.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        nowPlayingWidget.style.left = (e.clientX - offsetX) + 'px';
+        nowPlayingWidget.style.top = (e.clientY - offsetY) + 'px';
+      });
+      document.addEventListener('mouseup', () => { dragging = false; });
+    }
+
+    function stopMusic() {
+      if (nowPlayingWidget) { nowPlayingWidget.remove(); nowPlayingWidget = null; }
+    }
+
+    musicBtn.addEventListener('click', () => {
+      musicOn = !musicOn;
+      if (musicOn) {
+        startMusic();
+        musicBtn.textContent = '🔊 MUSIK AUS';
+        if (typeof showAchievement === 'function') showAchievement('Musik aktiviert 🎵');
+      } else {
+        stopMusic();
+        musicBtn.textContent = '🔇 MUSIK AN';
+      }
+    });
     const emojis = ['🌈','🐱','☮️','🌻','🕊️','✨','🎉','🦄','🌀'];
+    let memesActive = false;
+    let memeSpawnInterval = null;
     function party() {
+      if (!memesActive) {
+        memesActive = true;
+        spawnMeme();
+        memeSpawnInterval = setInterval(spawnMeme, 4800); // 20% faster than the original 6000ms
+        if (typeof showAchievement === 'function') showAchievement('Meme-Flut gestartet 🖼️');
+      }
+
       for (let i = 0; i < 30; i++) {
         const el = document.createElement('span');
         el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
@@ -161,6 +350,434 @@
         setTimeout(() => el.remove(), 3200);
       }
     }
+
+    // rainbow mouse trail
+    let hue = 0;
+    document.addEventListener('mousemove', (e) => {
+      const dot = document.createElement('div');
+      dot.style.position = 'fixed';
+      dot.style.left = e.clientX + 'px';
+      dot.style.top = e.clientY + 'px';
+      dot.style.width = '14px';
+      dot.style.height = '14px';
+      dot.style.borderRadius = '50%';
+      dot.style.pointerEvents = 'none';
+      dot.style.zIndex = 99999;
+      dot.style.background = `hsl(${hue}, 100%, 55%)`;
+      dot.style.boxShadow = `0 0 10px 2px hsl(${hue}, 100%, 55%)`;
+      dot.style.transform = 'translate(-50%, -50%)';
+      dot.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      document.body.appendChild(dot);
+      hue = (hue + 8) % 360;
+      requestAnimationFrame(() => {
+        dot.style.opacity = '0';
+        dot.style.transform = 'translate(-50%, -50%) scale(2.5)';
+      });
+      setTimeout(() => dot.remove(), 650);
+    });
+
+    // shy floating emojis: flee from the cursor
+    let mouseX = -9999, mouseY = -9999;
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+    const fleeRadius = 160;
+    const fleeStrength = 90;
+    const easing = 0.12;
+    const floaters = Array.from(document.querySelectorAll('.float1, .float2, .float3, .float4'))
+      .map((el) => ({ el, x: 0, y: 0 }));
+
+    function tick() {
+      for (const f of floaters) {
+        const rect = f.el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = cx - mouseX;
+        const dy = cy - mouseY;
+        const dist = Math.hypot(dx, dy) || 1;
+
+        let targetX = 0, targetY = 0;
+        if (dist < fleeRadius) {
+          const push = (fleeRadius - dist) / fleeRadius * fleeStrength;
+          targetX = (dx / dist) * push;
+          targetY = (dy / dist) * push;
+        }
+
+        f.x += (targetX - f.x) * easing;
+        f.y += (targetY - f.y) * easing;
+        f.el.style.setProperty('--dx', f.x.toFixed(1) + 'px');
+        f.el.style.setProperty('--dy', f.y.toFixed(1) + 'px');
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // fake-serious popup, then meltdown before actually leaving
+    const seriousLink = document.getElementById('serious-link');
+    const overlay = document.getElementById('modal-overlay');
+    const confirmBtn = document.getElementById('modal-confirm');
+
+    const captchaOverlay = document.getElementById('captcha-overlay');
+    const captchaBox = document.getElementById('captcha-box');
+    let captchaPassed = false;
+    let captchaPending = false;
+
+    document.getElementById('modal-close').addEventListener('click', () => {
+      overlay.style.display = 'none';
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+
+    document.getElementById('captcha-close').addEventListener('click', () => {
+      captchaOverlay.style.display = 'none';
+      captchaPending = false;
+    });
+    captchaOverlay.addEventListener('click', (e) => {
+      if (e.target === captchaOverlay) {
+        captchaOverlay.style.display = 'none';
+        captchaPending = false;
+      }
+    });
+
+    seriousLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (captchaPassed) {
+        overlay.style.display = 'flex';
+        return;
+      }
+      captchaPending = true;
+      captchaOverlay.style.display = 'flex';
+      captchaBox.style.animation = 'wiggle 0.4s ease 3';
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      overlay.style.display = 'none';
+      meltdown(seriousLink.href);
+    });
+
+    // fake tantra workshop booking
+    const tantraBtn = document.getElementById('tantra-btn');
+    const tantraResult = document.getElementById('tantra-result');
+    const tantraResponses = [
+      '🕉️ Gebucht! Bitte bringen Sie Ihre eigene Aura mit.',
+      '❌ Ausgebucht. Warteliste: nur Menschen mit offenem dritten Auge.',
+      '🧘 Bestätigt. Der Gong erwartet Sie um kosmische Zeit.',
+      '⚠️ Fehler: Zu viel Ernsthaftigkeit in Ihrer Anfrage erkannt.',
+    ];
+    tantraBtn.addEventListener('click', () => {
+      tantraResult.textContent = tantraResponses[Math.floor(Math.random() * tantraResponses.length)];
+      showAchievementSafe('Tantra-Workshop "gebucht" 🧘');
+
+      // Ram Dass image flies out directly from the button, independent of the
+      // "NOCH MEHR CHAOS" meme system
+      const rect = tantraBtn.getBoundingClientRect();
+      const img = document.createElement('img');
+      img.src = 'images/ram-dass.png';
+      img.style.cssText = `
+        position: fixed; z-index: 99994; pointer-events: none;
+        left: ${rect.left + rect.width / 2}px; top: ${rect.top + rect.height / 2}px;
+        width: 40px; height: auto; border-radius: 10px; border: 3px solid #a200ff;
+        box-shadow: 0 0 20px rgba(162,0,255,0.6);
+        opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+        transition: opacity 0.4s ease, transform 1.8s cubic-bezier(.2,.8,.3,1);
+      `;
+      document.body.appendChild(img);
+
+      const targetX = Math.random() * (window.innerWidth - 220) + 110;
+      const targetY = Math.random() * (window.innerHeight * 0.6) + 80;
+
+      requestAnimationFrame(() => {
+        img.style.opacity = '0.9';
+        img.style.width = '220px';
+        img.style.left = targetX + 'px';
+        img.style.top = targetY + 'px';
+        img.style.transform = `translate(-50%, -50%) scale(1) rotate(${(Math.random() * 40 - 20).toFixed(0)}deg)`;
+      });
+
+      setTimeout(() => { img.style.opacity = '0'; }, 6000);
+      setTimeout(() => { img.remove(); }, 6600);
+    });
+    function showAchievementSafe(text) {
+      if (typeof showAchievement === 'function') showAchievement(text);
+    }
+
+    function meltdown(destination) {
+      const shakeStyle = document.createElement('style');
+      shakeStyle.textContent = `
+        @keyframes screenshake {
+          0%,100% { transform: translate(0,0) rotate(0deg); }
+          10% { transform: translate(-6px,4px) rotate(-1deg); }
+          20% { transform: translate(6px,-4px) rotate(1deg); }
+          30% { transform: translate(-8px,2px) rotate(-1.5deg); }
+          40% { transform: translate(8px,-2px) rotate(1.5deg); }
+          50% { transform: translate(-5px,5px) rotate(-2deg); }
+          60% { transform: translate(5px,-5px) rotate(2deg); }
+          70% { transform: translate(-9px,3px) rotate(-2.5deg); }
+          80% { transform: translate(9px,-3px) rotate(2.5deg); }
+          90% { transform: translate(-4px,4px) rotate(-1deg); }
+        }
+        @keyframes glitchflash {
+          0%,100% { filter: none; }
+          20% { filter: hue-rotate(90deg) saturate(3); }
+          40% { filter: invert(1); }
+          60% { filter: hue-rotate(200deg) contrast(2); }
+          80% { filter: invert(1) hue-rotate(45deg); }
+        }
+      `;
+      document.head.appendChild(shakeStyle);
+
+      document.body.style.animation = 'screenshake 0.35s infinite, glitchflash 0.6s infinite';
+
+      const pieces = Array.from(document.body.children).filter((el) => el !== overlay);
+      pieces.forEach((el) => {
+        const fallDelay = Math.random() * 500;
+        const fallDuration = 900 + Math.random() * 900;
+        const rotate = (Math.random() * 900 - 450).toFixed(0);
+        const driftX = (Math.random() * 600 - 300).toFixed(0);
+        el.style.position = el.style.position || 'relative';
+        el.style.transition = `transform ${fallDuration}ms cubic-bezier(.55,0,.85,.35) ${fallDelay}ms, opacity ${fallDuration}ms ease ${fallDelay}ms`;
+        requestAnimationFrame(() => {
+          el.style.transform = `translate(${driftX}px, 130vh) rotate(${rotate}deg)`;
+          el.style.opacity = '0';
+        });
+      });
+
+      const bigText = document.createElement('div');
+      bigText.textContent = 'HAHA ERWISCHT 🤡';
+      bigText.style.cssText = `
+        position: fixed; inset: 0; display:flex; align-items:center; justify-content:center;
+        font-family: Impact, sans-serif; font-size: 4rem; color: #fff;
+        -webkit-text-stroke: 3px #ff00aa; text-align:center; z-index: 100001; opacity: 0;
+        transition: opacity 0.5s ease;
+      `;
+      // appended to <html>, not <body>: body gets shaken/rotated during meltdown,
+      // and a transformed ancestor turns fixed descendants into being positioned
+      // relative to it instead of the viewport, which could throw this off-screen
+      document.documentElement.appendChild(bigText);
+
+      const APPEAR_AT = 1600;
+      const HOLD_MS = 8000; // stay fully visible 8s longer before fading
+      const FADE_MS = 1500;
+
+      setTimeout(() => { bigText.style.opacity = '1'; }, APPEAR_AT);
+      setTimeout(() => {
+        bigText.style.transition = `opacity ${FADE_MS}ms ease`;
+        bigText.style.opacity = '0';
+      }, APPEAR_AT + HOLD_MS);
+      setTimeout(() => { bigText.remove(); }, APPEAR_AT + HOLD_MS + FADE_MS);
+
+      setTimeout(() => { window.location.href = destination; }, APPEAR_AT + HOLD_MS + FADE_MS);
+    }
+
+    // spontaneous, unprompted chaos spins
+    let chaosActive = false;
+    let panicClicks = 0;
+    let panicTaunt = null;
+
+    function triggerSpinChaos() {
+      chaosActive = true;
+      panicClicks = 0;
+      document.body.classList.add('chaos-spin');
+      if (typeof showAchievement === 'function') showAchievement('Spontanes Chaos ausgebrochen 🌀');
+
+      const stopHandler = () => {
+        panicClicks++;
+        if (panicClicks === 1 && !panicTaunt) {
+          panicTaunt = document.createElement('div');
+          panicTaunt.textContent = 'DU KANNST DAS CHAOS NICHT AUFHALTEN 🌀';
+          panicTaunt.style.cssText = `
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background:#000; color:#ffea00; padding:10px 18px; border-radius:10px;
+            font-family: Impact, sans-serif; font-size: 1.1rem; z-index: 100002;
+            border: 2px solid #ffea00;
+          `;
+          document.body.appendChild(panicTaunt);
+        }
+        if (panicClicks >= 3 && !document.body.classList.contains('chaos-panic')) {
+          document.body.classList.add('chaos-panic');
+          if (panicTaunt) panicTaunt.textContent = 'JETZT WIRD ES NUR SCHLIMMER 😈';
+        }
+      };
+      document.addEventListener('click', stopHandler);
+
+      setTimeout(() => {
+        document.body.classList.remove('chaos-spin', 'chaos-panic');
+        document.removeEventListener('click', stopHandler);
+        if (panicTaunt) { panicTaunt.remove(); panicTaunt = null; }
+
+        // shake/spin is done: zoom back in from a tiny point to full screen
+        document.body.classList.add('chaos-zoom');
+        setTimeout(() => {
+          document.body.classList.remove('chaos-zoom');
+          chaosActive = false;
+        }, 750);
+      }, 3200);
+    }
+
+    function scheduleChaos() {
+      const delay = 80000 + Math.random() * 32000; // 8x rarer than the original 10-14s
+      setTimeout(() => {
+        if (!chaosActive) triggerSpinChaos();
+        scheduleChaos();
+      }, delay);
+    }
+    scheduleChaos();
+
+    // floating meme images drifting through the background
+    const memeImages = [
+      'images/meme-suffer-in-silence.png',
+      'images/meme-which-organ-obama-brain.jpeg',
+      'images/meme-can-you-hear-me.jpeg',
+      'images/meme-kanye-bound2.jpeg',
+      'images/meme-kanye-face.gif',
+      'images/ram-dass.png',
+    ];
+    const activeMemes = [];
+    const MEME_SIZE = 180;
+    const MEME_LIFE = 8800; // 20% faster than the original 11000ms
+    const MEME_FADE = 1200;
+
+    function spawnMeme() {
+      const el = document.createElement('div');
+      el.className = 'meme-float';
+      const img = document.createElement('img');
+      img.src = memeImages[Math.floor(Math.random() * memeImages.length)];
+      el.appendChild(img);
+      el.addEventListener('click', () => showAchievement('Meme angeklickt 🖱️'));
+      document.body.appendChild(el);
+
+      const state = {
+        el,
+        x: Math.random() * (window.innerWidth - MEME_SIZE),
+        y: Math.random() * (window.innerHeight - MEME_SIZE),
+        targetX: Math.random() * (window.innerWidth - MEME_SIZE),
+        targetY: Math.random() * (window.innerHeight - MEME_SIZE),
+        speed: 0.008 + Math.random() * 0.014,
+      };
+      el.style.left = state.x + 'px';
+      el.style.top = state.y + 'px';
+      requestAnimationFrame(() => { el.style.opacity = '0.85'; });
+      activeMemes.push(state);
+
+      setTimeout(() => { el.style.opacity = '0'; }, MEME_LIFE);
+      setTimeout(() => {
+        el.remove();
+        const i = activeMemes.indexOf(state);
+        if (i !== -1) activeMemes.splice(i, 1);
+      }, MEME_LIFE + MEME_FADE);
+    }
+
+    function memeTick() {
+      for (const m of activeMemes) {
+        if (Math.hypot(m.targetX - m.x, m.targetY - m.y) < 24) {
+          m.targetX = Math.random() * (window.innerWidth - MEME_SIZE);
+          m.targetY = Math.random() * (window.innerHeight - MEME_SIZE);
+        }
+        m.x += (m.targetX - m.x) * m.speed;
+        m.y += (m.targetY - m.y) * m.speed;
+
+        const cx = m.x + MEME_SIZE / 2, cy = m.y + MEME_SIZE / 2;
+        const dx = cx - mouseX, dy = cy - mouseY;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < 150) {
+          const push = (150 - dist) / 150 * 10;
+          m.x += (dx / dist) * push;
+          m.y += (dy / dist) * push;
+        }
+
+        m.el.style.left = m.x + 'px';
+        m.el.style.top = m.y + 'px';
+      }
+      requestAnimationFrame(memeTick);
+    }
+    memeTick();
+    // spawning is now gated behind the "NOCH MEHR CHAOS" button (see party())
+
+    // achievement toasts
+    const achievement = document.getElementById('achievement');
+    const achievementText = document.getElementById('achievement-text');
+    const achievements = [
+      'Erste Regenbogenberührung 🌈',
+      'Katze erfolgreich verscheucht 🐱',
+      '10 Sekunden Chaos überlebt ⏱️',
+      'Comic Sans akzeptiert 💀',
+      'Kekse konsumiert 🍪',
+      'Ernsthaftigkeit verweigert 🙅',
+    ];
+    let achievementIndex = 0;
+    function showAchievement(text) {
+      achievementText.textContent = text;
+      achievement.style.right = '20px';
+      setTimeout(() => { achievement.style.right = '-400px'; }, 2600);
+    }
+    setInterval(() => {
+      showAchievement(achievements[achievementIndex % achievements.length]);
+      achievementIndex++;
+    }, 9000);
+
+    // fake captcha
+    const captchaBtn = document.getElementById('captcha-btn');
+    const captchaResult = document.getElementById('captcha-result');
+    const captchaResponses = [
+      '✅ Verifiziert. Sie sind zu 73% ein Mensch.',
+      '❌ Fehler. Bitte 3x im Kreis drehen und erneut versuchen.',
+      '✅ Bestanden! Willkommen im Chaos-Club.',
+      '⚠️ Verdacht auf Talar erkannt. Bitte ablegen.',
+    ];
+    captchaBtn.addEventListener('click', () => {
+      captchaResult.textContent = captchaResponses[Math.floor(Math.random() * captchaResponses.length)];
+      showAchievement('CAPTCHA "bestanden" 🤖');
+      if (captchaPending) {
+        captchaPending = false;
+        captchaPassed = true;
+        setTimeout(() => {
+          document.getElementById('captcha-overlay').style.display = 'none';
+          overlay.style.display = 'flex';
+        }, 900);
+      }
+    });
+
+    // cookie banner
+    document.getElementById('cookie-accept').addEventListener('click', () => {
+      document.getElementById('cookie-banner').remove();
+      showAchievement('Alle Kekse gegessen 🍪');
+    });
+
+    // click-anywhere confetti burst
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('button, a, #modal-overlay')) return;
+      for (let i = 0; i < 10; i++) {
+        const el = document.createElement('span');
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.position = 'fixed';
+        el.style.left = e.clientX + 'px';
+        el.style.top = e.clientY + 'px';
+        el.style.fontSize = (16 + Math.random() * 20) + 'px';
+        el.style.pointerEvents = 'none';
+        el.style.zIndex = 99996;
+        el.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
+        document.body.appendChild(el);
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 60;
+        requestAnimationFrame(() => {
+          el.style.transform = `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) rotate(${Math.random()*360}deg)`;
+          el.style.opacity = '0';
+        });
+        setTimeout(() => el.remove(), 850);
+      }
+    });
+
+    // konami code easter egg: ↑ ↑ ↓ ↓ ← → ← → b a
+    const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let konamiProgress = 0;
+    document.addEventListener('keydown', (e) => {
+      konamiProgress = (e.key === konami[konamiProgress]) ? konamiProgress + 1 : (e.key === konami[0] ? 1 : 0);
+      if (konamiProgress === konami.length) {
+        konamiProgress = 0;
+        showAchievement('KONAMI CODE ENTDECKT 🕹️');
+        meltdown(window.location.href);
+      }
+    });
   </script>
 </body>
 </html>
