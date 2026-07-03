@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>~*~ LUSTIG LUSTIG ~*~ ORGEL POWER ~*~</title>
+<style>
+  @keyframes rainbowbg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-40px); } }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+  @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+  @keyframes float { 0% { transform: translate(0,0); } 50% { transform: translate(20px,-30px); } 100% { transform: translate(0,0); } }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+    background: linear-gradient(270deg, #ff0080, #ff8c00, #ffee00, #00ff88, #00c9ff, #a200ff, #ff0080);
+    background-size: 1400% 1400%;
+    animation: rainbowbg 12s ease infinite;
+    color: #1a0033;
+    overflow-x: hidden;
+    text-align: center;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' font-size='24'><text y='24'>🌈</text></svg>") 16 16, auto;
+  }
+
+  h1 {
+    font-size: 4rem;
+    text-shadow: 3px 3px 0 #fff, 6px 6px 0 #ff00aa, -2px -2px 0 #00eaff;
+    animation: wiggle 1.2s infinite;
+    margin: 0.3em 0 0;
+    -webkit-text-stroke: 1px #1a0033;
+  }
+
+  .blink { animation: blink 1s step-start infinite; color: #fff; background: #ff0000; padding: 4px 12px; border: 3px dashed #000; display: inline-block; }
+
+  marquee {
+    background: repeating-linear-gradient(45deg, #ffea00, #ffea00 10px, #000 10px, #000 20px);
+    color: #ff00cc;
+    font-weight: bold;
+    font-size: 2rem;
+    padding: 10px 0;
+    text-shadow: 2px 2px #fff;
+  }
+
+  .box {
+    background: rgba(255,255,255,0.85);
+    border: 6px dotted #ff00aa;
+    border-radius: 30px;
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 25px;
+    box-shadow: 0 0 40px 10px #ffdd00;
+  }
+
+  .cat { font-size: 4rem; display: inline-block; animation: bounce 1.4s ease-in-out infinite; }
+  .cat:nth-child(2) { animation-delay: 0.2s; }
+  .cat:nth-child(3) { animation-delay: 0.4s; }
+  .cat:nth-child(4) { animation-delay: 0.6s; }
+
+  .peace { font-size: 6rem; animation: spin 4s linear infinite; display: inline-block; }
+
+  .float1 { position: fixed; top: 10%; left: 5%; font-size: 3rem; animation: float 6s ease-in-out infinite; }
+  .float2 { position: fixed; top: 60%; right: 8%; font-size: 3.5rem; animation: float 5s ease-in-out infinite reverse; }
+  .float3 { position: fixed; bottom: 5%; left: 15%; font-size: 3rem; animation: float 7s ease-in-out infinite; }
+  .float4 { position: fixed; top: 30%; right: 20%; font-size: 3rem; animation: float 4.5s ease-in-out infinite reverse; }
+
+  .meme {
+    font-family: Impact, "Arial Black", sans-serif;
+    text-transform: uppercase;
+    color: #fff;
+    -webkit-text-stroke: 2px black;
+    font-size: 2rem;
+    margin: 10px 0;
+  }
+
+  .doge { font-family: "Comic Sans MS", cursive; color: #7a5c00; font-size: 1.4rem; line-height: 2.2rem; }
+
+  button {
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 15px 30px;
+    border-radius: 50px;
+    border: 5px solid #000;
+    background: linear-gradient(90deg, #ff0080, #ffee00);
+    cursor: pointer;
+    animation: wiggle 0.8s infinite;
+  }
+
+  footer { padding: 40px; font-size: 1rem; }
+</style>
+</head>
+<body>
+
+  <span class="float1">🌈</span>
+  <span class="float2">🐱</span>
+  <span class="float3">☮️</span>
+  <span class="float4">🌻</span>
+
+  <h1>~*~ LUSTIG LUSTIG ~*~</h1>
+  <p class="blink">🚧 DIESE SEITE IST NIEMALS FERTIG UND DAS IST GUT SO 🚧</p>
+
+  <marquee scrollamount="12">✨ WILLKOMMEN AUF DER OFFIZIELLEN INOFFIZIELLEN SEITE VON NIKLAS "DER ORGEL-GURU" LUSTIG ✨ ORGEL IST NUR EIN INSTRUMENT, LIEBE IST DIE WAHRE TONART ✨</marquee>
+
+  <div class="peace">☮️</div>
+
+  <div class="box">
+    <p class="cat">🐱</p><p class="cat" style="display:inline-block">🐱</p><p class="cat" style="display:inline-block">🐱</p><p class="cat" style="display:inline-block">🐱</p>
+    <h2 class="meme">SUCH ORGAN. MANY PIPES. WOW.</h2>
+    <p class="doge">
+      much kirchenmusik. very tallinn. so pärt. wow choir.<br />
+      such liturgie. many candles. very peace. so groovy 🕯️🕊️
+    </p>
+  </div>
+
+  <div class="box">
+    <h2 style="color:#ff00aa;">🌈 DIE 7 CHAKREN DER ORGELPFEIFE 🌈</h2>
+    <p>🎹 Manual eins = Wurzelchakra<br />
+    🎹 Manual zwei = Herzchakra<br />
+    🦶 Pedal = Erdung, ganz wörtlich<br />
+    🕉️ Registerzug = spirituelles Erwachen<br />
+    😹 Katze auf der Bank = höchste Erleuchtung</p>
+  </div>
+
+  <div class="box">
+    <h2 class="meme">PEACE. LOVE. ORGELPUNKT.</h2>
+    <p>Diese Seite existiert aus reiner, unkontrollierter Freude und ist mit Absicht komplett übertrieben.<br />
+    Für die ernsthafte, seriöse, erwachsene Version bitte hier entlang: <br />
+    <a href="https://nlustig.netlify.app" style="color:#a200ff; font-weight:bold;">nlustig.netlify.app 🧐</a></p>
+  </div>
+
+  <button onclick="party()">🎉 NOCH MEHR CHAOS 🎉</button>
+
+  <footer>
+    made with 🌈, 🐱 and zero Ernsthaftigkeit &middot; © <span id="year"></span> Lustig Lustig
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const emojis = ['🌈','🐱','☮️','🌻','🕊️','✨','🎉','🦄','🌀'];
+    function party() {
+      for (let i = 0; i < 30; i++) {
+        const el = document.createElement('span');
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.position = 'fixed';
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-50px';
+        el.style.fontSize = (20 + Math.random() * 40) + 'px';
+        el.style.transition = 'transform 3s linear, top 3s linear';
+        el.style.zIndex = 9999;
+        document.body.appendChild(el);
+        requestAnimationFrame(() => {
+          el.style.top = '110vh';
+          el.style.transform = `rotate(${Math.random() * 720 - 360}deg)`;
+        });
+        setTimeout(() => el.remove(), 3200);
+      }
+    }
+  </script>
+</body>
+</html>
