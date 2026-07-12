@@ -11,7 +11,10 @@
     100% { background-position: 0% 50%; }
   }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-40px); } }
+  @keyframes bounce {
+    0%,100% { transform: translateY(var(--dy, 0px)); }
+    50%      { transform: translateY(calc(-40px + var(--dy, 0px))); }
+  }
   @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
   @keyframes wiggle { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
   @keyframes tickerscroll {
@@ -41,6 +44,56 @@
   }
   body.chaos-zoom { animation: zoomreveal 0.7s cubic-bezier(.2,.9,.3,1) both, rainbowbg 12s ease infinite; transform-origin: center center; }
 
+  @keyframes waxwane {
+    0%, 100% { transform: translate(-50%, -50%) scale(0.85); }
+    50%      { transform: translate(-50%, -50%) scale(1.15); }
+  }
+
+  @keyframes ramFloat {
+    0%   { margin-top: 0px; filter: hue-rotate(0deg); }
+    50%  { margin-top: -22px; filter: hue-rotate(35deg); }
+    100% { margin-top: 0px; filter: hue-rotate(0deg); }
+  }
+  .ram-dass-img { animation: ramFloat 3.4s ease-in-out infinite; cursor: pointer; }
+  .ram-dass-img.zapped { animation: none; }
+
+  /* psychedelic geometry: kaleidoscope + ripple, blended into the rainbow bg */
+  #psych-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  #psych-bg::before, #psych-bg::after { content: ''; position: absolute; inset: -60%; }
+  #psych-bg::before {
+    background: repeating-conic-gradient(from 0deg,
+      rgba(255,0,128,0.45) 0deg 12deg, rgba(0,201,255,0.45) 12deg 24deg,
+      rgba(255,234,0,0.45) 24deg 36deg, rgba(162,0,255,0.45) 36deg 48deg);
+    mix-blend-mode: overlay;
+    animation: psychSpin 42s linear infinite;
+  }
+  #psych-bg::after {
+    background: repeating-radial-gradient(circle at 50% 50%,
+      transparent 0 26px, rgba(255,255,255,0.16) 26px 30px);
+    mix-blend-mode: soft-light;
+    animation: psychSpin 26s linear infinite reverse;
+  }
+  @keyframes psychSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  #psych-bg.burst::before { animation-duration: 4s; }
+  #psych-bg.burst::after { animation-duration: 3s; }
+
+  /* brief unrelated "anomaly" glitch, independent of the big chaos-spin */
+  @keyframes glitchAnomaly {
+    0%, 100% { transform: translate(0, 0); filter: none; }
+    20% { transform: translate(-5px, 2px); filter: drop-shadow(2px 0 #ff0080) drop-shadow(-2px 0 #00eaff); }
+    45% { transform: translate(4px, -3px); filter: drop-shadow(-3px 0 #ff0080) drop-shadow(3px 0 #00eaff); }
+    70% { transform: translate(-2px, 1px); filter: drop-shadow(1px 0 #ff0080) drop-shadow(-1px 0 #00eaff); }
+  }
+  body.glitch-anomaly { animation: glitchAnomaly 0.4s steps(2, end); }
+
+  @keyframes memePop {
+    0%   { transform: scale(1) rotate(0deg); opacity: 0.85; }
+    30%  { transform: scale(1.35) rotate(-8deg); opacity: 1; }
+    60%  { transform: scale(1.5) rotate(10deg); opacity: 1; }
+    100% { transform: scale(0.2) rotate(35deg); opacity: 0; }
+  }
+  .meme-float.popping { animation: memePop 0.5s ease-in forwards; pointer-events: none; }
+
   html, body {
     margin: 0;
     min-height: 100%;
@@ -62,9 +115,11 @@
     -webkit-text-stroke: 1px #1a0033;
   }
 
-  .blink { animation: blink 1s step-start infinite; color: #fff; background: #ff0000; padding: 4px 12px; border: 3px dashed #000; display: inline-block; }
+  .blink { position: relative; z-index: 1; animation: blink 1s step-start infinite; color: #fff; background: #ff0000; padding: 4px 12px; border: 3px dashed #000; display: inline-block; }
 
   marquee {
+    position: relative;
+    z-index: 1;
     background: repeating-linear-gradient(45deg, #ffea00, #ffea00 10px, #000 10px, #000 20px);
     color: #ff00cc;
     font-weight: bold;
@@ -74,7 +129,9 @@
   }
 
   .box {
-    background: rgba(255,255,255,0.85);
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,1);
     border: 6px dotted #ff00aa;
     border-radius: 30px;
     max-width: 700px;
@@ -94,6 +151,12 @@
   .float2 { position: fixed; top: 60%; right: 8%; font-size: 3.5rem; animation: float 5s ease-in-out infinite reverse; }
   .float3 { position: fixed; bottom: 5%; left: 15%; font-size: 3rem; animation: float 7s ease-in-out infinite; }
   .float4 { position: fixed; top: 30%; right: 20%; font-size: 3rem; animation: float 4.5s ease-in-out infinite reverse; }
+  .float5 { position: fixed; top: 45%; left: 45%; font-size: 3rem; animation: float 5.5s ease-in-out infinite; }
+  .float6 { position: fixed; top: 15%; right: 40%; font-size: 2.8rem; animation: float 6.5s ease-in-out infinite reverse; }
+  .float7 { position: fixed; bottom: 20%; right: 12%; font-size: 3.2rem; animation: float 5.8s ease-in-out infinite; }
+  .float8 { position: fixed; bottom: 35%; left: 8%; font-size: 3rem; animation: float 7.5s ease-in-out infinite reverse; }
+  .float9 { position: fixed; top: 75%; left: 30%; font-size: 2.8rem; animation: float 6.2s ease-in-out infinite; }
+  .float10 { position: fixed; top: 5%; left: 55%; font-size: 3rem; animation: float 4.8s ease-in-out infinite reverse; }
 
   .meme {
     font-family: Impact, "Arial Black", sans-serif;
@@ -136,15 +199,23 @@
 </head>
 <body>
 
+  <div id="psych-bg"></div>
+
   <span class="float1">🌈</span>
   <span class="float2">🐱</span>
   <span class="float3">☮️</span>
   <span class="float4">🌻</span>
+  <span class="float5">🦄</span>
+  <span class="float6">🍄</span>
+  <span class="float7">🕊️</span>
+  <span class="float8">✨</span>
+  <span class="float9">🌸</span>
+  <span class="float10">🔮</span>
 
   <button id="music-toggle" style="position:fixed; top:16px; left:16px; z-index:99996; font-size:1rem; padding:10px 16px; animation:wiggle 1.6s infinite;">🔇 MUSIK AN</button>
 
   <h1>~*~ LUSTIG LUSTIG ~*~</h1>
-  <p class="blink">🚧 DIESE SEITE IST NIEMALS FERTIG UND DAS IST GUT SO 🚧</p>
+  <p class="blink">🚧 AUF DER OFFIZIELLEN WEBSITE VON ORGEL-GURU NIKLAS UNLUSTIG 🚧</p>
 
   <marquee scrollamount="12">✨ WILLKOMMEN AUF DER OFFIZIELLEN INOFFIZIELLEN SEITE VON NIKLAS "DER ORGEL-GURU" LUSTIG ✨ ORGEL IST NUR EIN INSTRUMENT, LIEBE IST DIE WAHRE TONART ✨</marquee>
 
@@ -172,7 +243,7 @@
     <h2 class="meme">PEACE. LOVE. ORGELPUNKT.</h2>
     <p>Diese Seite existiert aus reiner, unkontrollierter Freude und ist mit Absicht komplett übertrieben.<br />
     Für die ernsthafte, seriöse, erwachsene Version bitte hier entlang: <br />
-    <a id="serious-link" href="https://nlustig.netlify.app" style="color:#a200ff; font-weight:bold;">nlustig.netlify.app 🧐</a></p>
+    <a id="serious-link" href="https://niklaslustig.de" style="color:#a200ff; font-weight:bold;">niklaslustig.de 🧐</a></p>
   </div>
 
   <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100000; align-items:center; justify-content:center;">
@@ -180,7 +251,7 @@
       <button id="modal-close" aria-label="Schließen" style="position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%; border:2px solid #000; background:#eee; font-size:1.1rem; line-height:1; cursor:pointer; animation:none; padding:0;">✕</button>
       <p style="font-size:1.1rem; line-height:1.5;">⚠️ Sie verlassen jetzt den seriösen, professionellen Bereich der Kirchenmusik.</p>
       <p style="font-size:0.95rem; color:#555;">Bitte bestätigen Sie, dass Sie bereit für absolute Ernsthaftigkeit sind.</p>
-      <p style="font-size:1.05rem; color:#111; margin-top:16px; padding:10px; background:#f0f0f0; border:2px dashed #999; border-radius:8px;">➡️ Weiterleitung zu <strong style="font-size:1.15rem;">nlustig.netlify.app</strong></p>
+      <p style="font-size:1.05rem; color:#111; margin-top:16px; padding:10px; background:#f0f0f0; border:2px dashed #999; border-radius:8px;">➡️ Weiterleitung zu <strong style="font-size:1.15rem;">niklaslustig.de</strong></p>
       <button id="modal-confirm" style="margin-top:10px; font-family:Georgia,serif; font-size:1rem; padding:10px 20px; border-radius:6px; border:2px solid #000; background:#eee; cursor:pointer; animation:none;">Ja, ich bin bereit.</button>
     </div>
   </div>
@@ -213,8 +284,31 @@
     <button id="cookie-accept" style="padding:8px 16px; border-radius:6px; border:none; background:#ffea00; font-weight:bold; cursor:pointer;">Alle Kekse essen 🍪</button>
   </div>
 
-  <div id="achievement" style="position:fixed; top:20px; right:-400px; background:#111; color:#ffea00; padding:14px 20px; border-radius:10px; border:2px solid #ffea00; font-family:Georgia,serif; z-index:99997; transition: right 0.5s ease; box-shadow:0 0 20px rgba(255,234,0,0.5);">
+  <div id="achievement" style="position:fixed; top:70px; right:-400px; max-width:min(320px, calc(100vw - 100px)); background:#111; color:#ffea00; padding:14px 20px; border-radius:10px; border:2px solid #ffea00; font-family:Georgia,serif; z-index:99997; transition: right 0.5s ease; box-shadow:0 0 20px rgba(255,234,0,0.5);">
     🏆 <span id="achievement-text">Achievement freigeschaltet!</span>
+  </div>
+
+  <div id="music-chooser-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center;">
+    <div id="music-chooser-box" style="position:relative; background:#111; border:4px solid #ffea00; border-radius:16px; width:min(92vw, 640px); display:flex; flex-wrap:wrap; overflow:hidden; box-shadow:0 0 50px rgba(255,234,0,0.5); font-family:Georgia,serif; color:#fff;">
+      <button id="chooser-close" aria-label="Schließen" style="position:absolute; top:8px; right:8px; width:32px; height:32px; border-radius:50%; border:2px solid #000; background:#ffea00; font-size:1.1rem; cursor:pointer; animation:none; z-index:2;">✕</button>
+
+      <div style="flex:1 1 260px; padding:26px 20px; border-right:2px dashed #444; text-align:center;">
+        <h3 style="color:#ffea00; font-family:Impact; margin-top:0;">🎡 MUSIK-ROULETTE</h3>
+        <div style="position:relative; width:180px; height:180px; margin:10px auto;">
+          <div id="roulette-pointer" style="position:absolute; top:-14px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-top:16px solid #ffea00; z-index:2;"></div>
+          <div id="roulette-wheel" style="width:180px; height:180px; border-radius:50%; border:4px solid #000; background: conic-gradient(#a200ff 0deg 120deg, #00c9ff 120deg 240deg, #ff0080 240deg 360deg); transition: transform 3.5s cubic-bezier(.15,.85,.25,1); cursor:pointer;"></div>
+        </div>
+        <button id="roulette-spin">🎡 DREHEN</button>
+        <p style="font-size:0.75rem; color:#999; margin: 8px 0 14px;">oder ohne Umwege:</p>
+        <button id="roulette-default" style="font-size:0.9rem; padding:8px 14px;">🎵 Empfehlung des Hauses</button>
+      </div>
+
+      <div id="chooser-right" style="flex:1 1 260px; padding:26px 20px; text-align:center; position:relative; min-height:260px; overflow:hidden;">
+        <h3 style="color:#a200ff; font-family:Impact; margin-top:0;">🧘 RUHE FINDEN</h3>
+        <p style="font-size:0.8rem; color:#999;">Versuch, sie zu fangen.</p>
+        <button id="calm-organ-btn" style="position:absolute; font-size:0.85rem; padding:10px 14px; animation:none; line-height:1.3;">🧘 BERUHIGENDE<br>ORGELMUSIK</button>
+      </div>
+    </div>
   </div>
 
   <div id="ticker-bar" style="position:fixed; left:0; right:0; bottom:0; display:flex; align-items:stretch; font-family:Impact, sans-serif; overflow:hidden; border-top:4px solid #fff; z-index:99990; height:50px;">
@@ -246,23 +340,48 @@
     // background music via the official YouTube embed player (plays through
     // YouTube's own player/ads, not a ripped/copied audio file)
     let musicOn = false;
-    let nowPlayingWidget = null;
-    let nowPlayingMinimized = false;
     const musicBtn = document.getElementById('music-toggle');
-    const YOUTUBE_VIDEO_ID = 'QB15JltRf-M';
+    const DEFAULT_VIDEO = { id: 'QB15JltRf-M', start: 3 };
+    const ROULETTE_VIDEOS = [
+      { id: 'mp-HWukUDSE' },
+      { id: 'rmHDhAohJlQ' },
+      { id: 'lZbfNtDCHdM' },
+    ];
 
-    function startMusic() {
-      nowPlayingWidget = document.createElement('div');
-      nowPlayingWidget.id = 'now-playing';
-      nowPlayingWidget.style.cssText = `
+    // fetch the video's real title from YouTube's public oEmbed endpoint
+    // instead of making one up
+    async function fetchVideoTitle(id) {
+      try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+        if (!res.ok) throw new Error('oEmbed failed');
+        const data = await res.json();
+        return data.title;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // only one video may play at a time — whoever starts a new one must
+    // stop whatever's currently active first
+    let currentVideoStop = null;
+    function stopCurrentVideo() {
+      if (currentVideoStop) { currentVideoStop(); currentVideoStop = null; }
+    }
+
+    function playVideo(video) {
+      stopCurrentVideo();
+      const widget = document.createElement('div');
+      widget.id = 'now-playing';
+      widget.style.cssText = `
         position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 99995;
         background:#111; border: 4px solid #ffea00; border-radius: 14px;
         font-family: Georgia, serif; color: #fff; overflow: hidden;
         box-shadow: 0 0 60px rgba(255,234,0,0.6); width: min(90vw, 720px);
       `;
-      nowPlayingWidget.innerHTML = `
+      const startParam = video.start ? `&start=${video.start}` : '';
+      widget.innerHTML = `
         <div id="now-playing-bar" style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#000; cursor:move; user-select:none;">
-          <span style="font-size:1.1rem;">🎵 Jetzt läuft: Polyphia – Can You Feel It</span>
+          <span id="now-playing-title" style="font-size:1.1rem;">🎵 Jetzt läuft: …</span>
           <span style="display:flex; gap:10px;">
             <button id="now-playing-min" title="Minimieren" style="all:unset; cursor:pointer; font-size:1.2rem; padding:2px 8px;">➖</button>
             <button id="now-playing-close" title="Schließen" style="all:unset; cursor:pointer; font-size:1.2rem; padding:2px 8px;">✕</button>
@@ -270,20 +389,25 @@
         </div>
         <div id="now-playing-video">
           <iframe width="100%" height="405" style="display:block; border:0;"
-            src="https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&start=3"
+            src="https://www.youtube.com/embed/${video.id}?autoplay=1&loop=1&playlist=${video.id}${startParam}"
             allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
       `;
-      document.body.appendChild(nowPlayingWidget);
+      fetchVideoTitle(video.id).then((title) => {
+        const titleEl = document.getElementById('now-playing-title');
+        if (titleEl) titleEl.textContent = `🎵 Jetzt läuft: ${title || video.id}`;
+      });
+      document.body.appendChild(widget);
 
+      let minimized = false;
       document.getElementById('now-playing-close').addEventListener('click', () => {
+        stopCurrentVideo();
         musicOn = false;
-        stopMusic();
         musicBtn.textContent = '🔇 MUSIK AN';
       });
       document.getElementById('now-playing-min').addEventListener('click', () => {
-        nowPlayingMinimized = !nowPlayingMinimized;
-        document.getElementById('now-playing-video').style.display = nowPlayingMinimized ? 'none' : 'block';
+        minimized = !minimized;
+        document.getElementById('now-playing-video').style.display = minimized ? 'none' : 'block';
       });
 
       // draggable by its header bar
@@ -292,43 +416,226 @@
       bar.addEventListener('mousedown', (e) => {
         if (e.target.closest('button')) return;
         dragging = true;
-        const rect = nowPlayingWidget.getBoundingClientRect();
+        const rect = widget.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
         offsetY = e.clientY - rect.top;
-        nowPlayingWidget.style.transform = 'none';
-        nowPlayingWidget.style.left = rect.left + 'px';
-        nowPlayingWidget.style.top = rect.top + 'px';
+        widget.style.transform = 'none';
+        widget.style.left = rect.left + 'px';
+        widget.style.top = rect.top + 'px';
       });
-      document.addEventListener('mousemove', (e) => {
+      const onMove = (e) => {
         if (!dragging) return;
-        nowPlayingWidget.style.left = (e.clientX - offsetX) + 'px';
-        nowPlayingWidget.style.top = (e.clientY - offsetY) + 'px';
-      });
-      document.addEventListener('mouseup', () => { dragging = false; });
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+      };
+      const onUp = () => { dragging = false; };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+
+      currentVideoStop = () => {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        widget.remove();
+      };
     }
 
-    function stopMusic() {
-      if (nowPlayingWidget) { nowPlayingWidget.remove(); nowPlayingWidget = null; }
+    // music chooser popup: roulette wheel (left) + fleeing "calm organ" button (right)
+    const chooserOverlay = document.getElementById('music-chooser-overlay');
+    const rouletteWheel = document.getElementById('roulette-wheel');
+    let rouletteRotation = 0;
+    let calmBtnTick = null;
+
+    function openMusicChooser() {
+      chooserOverlay.style.display = 'flex';
+      startCalmButtonFlee();
     }
+    function closeMusicChooser() {
+      chooserOverlay.style.display = 'none';
+      if (calmBtnTick) { cancelAnimationFrame(calmBtnTick); calmBtnTick = null; }
+    }
+
+    function startCalmButtonFlee() {
+      const container = document.getElementById('chooser-right');
+      const btn = document.getElementById('calm-organ-btn');
+      let bx = 20, by = 60;
+      let targetX = 20, targetY = 60;
+      let nextIdleTargetAt = 0;
+      btn.style.left = bx + 'px';
+      btn.style.top = by + 'px';
+
+      function tick(ts) {
+        if (chooserOverlay.style.display === 'none') return;
+        const rect = container.getBoundingClientRect();
+        const btnRect = btn.getBoundingClientRect();
+        const w = rect.width, h = rect.height;
+        const bw = btnRect.width, bh = btnRect.height;
+        const maxX = Math.max(4, w - bw - 4);
+        const maxY = Math.max(4, h - bh - 4);
+
+        // ambient idle drift, like the floaters — always a little restless
+        if (!ts || ts > nextIdleTargetAt) {
+          targetX = 4 + Math.random() * (maxX - 4);
+          targetY = 4 + Math.random() * (maxY - 4);
+          nextIdleTargetAt = (ts || 0) + 1500 + Math.random() * 1500;
+        }
+        bx += (targetX - bx) * 0.03;
+        by += (targetY - by) * 0.03;
+
+        // flee from the cursor
+        const cx = btnRect.left + bw / 2;
+        const cy = btnRect.top + bh / 2;
+        const dx = cx - mouseX, dy = cy - mouseY;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < 150) {
+          const push = (150 - dist) / 150 * 26;
+          bx += (dx / dist) * push;
+          by += (dy / dist) * push;
+        }
+
+        // push away from walls/corners so the cursor can never pin it down
+        const edge = 36;
+        if (bx < edge) bx += (edge - bx) * 0.4;
+        if (bx > maxX - edge) bx -= (bx - (maxX - edge)) * 0.4;
+        if (by < edge) by += (edge - by) * 0.4;
+        if (by > maxY - edge) by -= (by - (maxY - edge)) * 0.4;
+
+        bx = Math.max(0, Math.min(maxX, bx));
+        by = Math.max(0, Math.min(maxY, by));
+        btn.style.left = bx + 'px';
+        btn.style.top = by + 'px';
+
+        calmBtnTick = requestAnimationFrame(tick);
+      }
+      calmBtnTick = requestAnimationFrame(tick);
+    }
+
+    // it can never actually be caught — clicking it (on the rare mis-click) does nothing
+    document.getElementById('calm-organ-btn').addEventListener('click', () => {
+      closeMusicChooser();
+      playVideo({ id: 'ZLliXV4eI6o' });
+      if (typeof showAchievement === 'function') showAchievement('Beruhigende Orgelmusik gefangen 🧘');
+    });
+
+    document.getElementById('roulette-default').addEventListener('click', () => {
+      closeMusicChooser();
+      playVideo(DEFAULT_VIDEO);
+    });
+
+    function spinRoulette() {
+      const spins = 4 + Math.floor(Math.random() * 3);
+      const finalOffset = Math.floor(Math.random() * 360);
+      rouletteRotation += spins * 360 + finalOffset;
+      rouletteWheel.style.transform = `rotate(${rouletteRotation}deg)`;
+
+      const settled = ((360 - (rouletteRotation % 360)) + 360) % 360;
+      const index = Math.min(2, Math.floor(settled / 120));
+
+      const handler = () => {
+        rouletteWheel.removeEventListener('transitionend', handler);
+        closeMusicChooser();
+        playVideo(ROULETTE_VIDEOS[index]);
+      };
+      rouletteWheel.addEventListener('transitionend', handler);
+    }
+    document.getElementById('roulette-spin').addEventListener('click', spinRoulette);
+    rouletteWheel.addEventListener('click', spinRoulette);
+
+    document.getElementById('chooser-close').addEventListener('click', closeMusicChooser);
+    chooserOverlay.addEventListener('click', (e) => { if (e.target === chooserOverlay) closeMusicChooser(); });
 
     musicBtn.addEventListener('click', () => {
-      musicOn = !musicOn;
       if (musicOn) {
-        startMusic();
-        musicBtn.textContent = '🔊 MUSIK AUS';
-        if (typeof showAchievement === 'function') showAchievement('Musik aktiviert 🎵');
-      } else {
-        stopMusic();
+        stopCurrentVideo();
+        closeMusicChooser();
+        musicOn = false;
         musicBtn.textContent = '🔇 MUSIK AN';
+      } else {
+        musicOn = true;
+        musicBtn.textContent = '🔊 MUSIK AUS';
+        openMusicChooser();
       }
     });
+
+    // every 6 minutes, an uninvited video surprise — alternates style each time
+    let surpriseCount = 0;
+    function triggerSurpriseVideo() {
+      surpriseCount++;
+      if (surpriseCount % 2 === 1) {
+        playSurpriseLarge({ id: 'cbB3iGRHtqA', title: 'Überraschung 🎥' });
+      } else {
+        playSurpriseGhost({ id: 'TZ827lkktYs', title: 'Überraschung 🎥' });
+      }
+    }
+    setInterval(triggerSurpriseVideo, 6 * 60 * 1000);
+
+    // meme of the hour: full-screen image popup
+    const MEME_OF_THE_HOUR = 'images/1f68362d918544bdffdc916ac26b5da6.jpg';
+    function triggerMemeOfTheHour() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed; inset: 0; z-index: 100004; background: rgba(0,0,0,0.85);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+      `;
+      overlay.innerHTML = `
+        <p style="font-family: Impact, sans-serif; color: #ffea00; font-size: 1.8rem; text-shadow: 2px 2px #000;">🎭 MEME DER STUNDE 🎭</p>
+        <img src="${MEME_OF_THE_HOUR}" style="max-width: 85vw; max-height: 75vh; border-radius: 14px; border: 5px solid #ffea00; box-shadow: 0 0 60px rgba(255,234,0,0.6);" />
+        <button id="meme-hour-close" style="font-size: 1rem; padding: 10px 20px;">✕ Schließen</button>
+      `;
+      document.body.appendChild(overlay);
+      const close = () => overlay.remove();
+      document.getElementById('meme-hour-close').addEventListener('click', close);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    }
+    setInterval(triggerMemeOfTheHour, 60 * 60 * 1000);
+
+    function playSurpriseLarge(video) {
+      stopCurrentVideo();
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.85);
+        z-index: 100002; border: 4px solid #ff0080; border-radius: 16px; overflow: hidden;
+        box-shadow: 0 0 60px rgba(255,0,128,0.7); width: min(90vw, 640px);
+        animation: waxwane 3.5s ease-in-out infinite;
+      `;
+      el.innerHTML = `
+        <button id="surprise-close-large" style="position:absolute; top:8px; right:8px; z-index:2; width:32px; height:32px; border-radius:50%; border:2px solid #000; background:#ffea00; cursor:pointer; animation:none;">✕</button>
+        <iframe width="100%" height="360" style="display:block; border:0;"
+          src="https://www.youtube.com/embed/${video.id}?autoplay=1&loop=1&playlist=${video.id}"
+          allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      `;
+      document.body.appendChild(el);
+      const close = () => el.remove();
+      document.getElementById('surprise-close-large').addEventListener('click', close);
+      currentVideoStop = close;
+      setTimeout(() => { if (currentVideoStop === close) { close(); currentVideoStop = null; } }, 30000);
+    }
+
+    function playSurpriseGhost(video) {
+      stopCurrentVideo();
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position: fixed; bottom: 60px; left: 12px; z-index: 100002;
+        opacity: 0.15; border-radius: 10px; overflow: hidden; pointer-events: none;
+        width: 200px;
+      `;
+      el.innerHTML = `
+        <iframe width="200" height="113" style="display:block; border:0;"
+          src="https://www.youtube.com/embed/${video.id}?autoplay=1&loop=1&playlist=${video.id}&controls=0"
+          allow="autoplay; encrypted-media"></iframe>
+      `;
+      document.body.appendChild(el);
+      const close = () => el.remove();
+      currentVideoStop = close;
+      setTimeout(() => { if (currentVideoStop === close) { close(); currentVideoStop = null; } }, 30000);
+    }
+
     const emojis = ['🌈','🐱','☮️','🌻','🕊️','✨','🎉','🦄','🌀'];
     let memesActive = false;
     let memeSpawnInterval = null;
     function party() {
       if (!memesActive) {
         memesActive = true;
-        spawnMeme();
+        memeImages.forEach(() => spawnMeme());
         memeSpawnInterval = setInterval(spawnMeme, 4800); // 20% faster than the original 6000ms
         if (typeof showAchievement === 'function') showAchievement('Meme-Flut gestartet 🖼️');
       }
@@ -383,8 +690,14 @@
     const fleeRadius = 160;
     const fleeStrength = 90;
     const easing = 0.12;
-    const floaters = Array.from(document.querySelectorAll('.float1, .float2, .float3, .float4'))
+    const floaters = Array.from(document.querySelectorAll('.float1, .float2, .float3, .float4, .float5, .float6, .float7, .float8, .float9, .float10'))
       .map((el) => ({ el, x: 0, y: 0 }));
+
+    // the 4 bouncing cats in the "SUCH ORGAN" box: cursor nudges them up/down
+    // vertically (on top of their existing bounce animation)
+    const catRadius = 220;
+    const catStrength = 60;
+    const cats = Array.from(document.querySelectorAll('.cat')).map((el) => ({ el, y: 0 }));
 
     function tick() {
       for (const f of floaters) {
@@ -406,6 +719,22 @@
         f.y += (targetY - f.y) * easing;
         f.el.style.setProperty('--dx', f.x.toFixed(1) + 'px');
         f.el.style.setProperty('--dy', f.y.toFixed(1) + 'px');
+      }
+
+      for (const c of cats) {
+        const rect = c.el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dist = Math.hypot(cx - mouseX, cy - mouseY) || 1;
+
+        let targetY = 0;
+        if (dist < catRadius) {
+          // cursor above -> nudge cat down; cursor below -> nudge cat up
+          const push = (catRadius - dist) / catRadius * catStrength;
+          targetY = mouseY < cy ? push : -push;
+        }
+        c.y += (targetY - c.y) * easing;
+        c.el.style.setProperty('--dy', c.y.toFixed(1) + 'px');
       }
       requestAnimationFrame(tick);
     }
@@ -473,8 +802,9 @@
       const rect = tantraBtn.getBoundingClientRect();
       const img = document.createElement('img');
       img.src = 'images/ram-dass.png';
+      img.className = 'ram-dass-img';
       img.style.cssText = `
-        position: fixed; z-index: 99994; pointer-events: none;
+        position: fixed; z-index: 99994;
         left: ${rect.left + rect.width / 2}px; top: ${rect.top + rect.height / 2}px;
         width: 40px; height: auto; border-radius: 10px; border: 3px solid #a200ff;
         box-shadow: 0 0 20px rgba(162,0,255,0.6);
@@ -483,15 +813,32 @@
       `;
       document.body.appendChild(img);
 
-      const targetX = Math.random() * (window.innerWidth - 220) + 110;
-      const targetY = Math.random() * (window.innerHeight * 0.6) + 80;
+      const relocate = () => {
+        const x = Math.random() * (window.innerWidth - 220) + 110;
+        const y = Math.random() * (window.innerHeight * 0.6) + 80;
+        img.style.left = x + 'px';
+        img.style.top = y + 'px';
+        img.style.transform = `translate(-50%, -50%) scale(1) rotate(${(Math.random() * 40 - 20).toFixed(0)}deg)`;
+      };
 
       requestAnimationFrame(() => {
         img.style.opacity = '0.9';
         img.style.width = '220px';
-        img.style.left = targetX + 'px';
-        img.style.top = targetY + 'px';
-        img.style.transform = `translate(-50%, -50%) scale(1) rotate(${(Math.random() * 40 - 20).toFixed(0)}deg)`;
+        relocate();
+      });
+
+      // clicking it triggers a trippy zoom-twirl instead of instantly
+      // teleporting: it spins/zooms in place first, then eases to a new spot
+      img.addEventListener('click', () => {
+        img.classList.add('zapped');
+        img.style.transition = 'transform 0.5s cubic-bezier(.3,1.6,.4,1)';
+        img.style.transform = `translate(-50%, -50%) scale(1.6) rotate(${720 + Math.random() * 360}deg)`;
+        showAchievementSafe('Ram Dass gezappt 🌀');
+        setTimeout(() => {
+          img.style.transition = 'transform 1.4s cubic-bezier(.2,.8,.3,1)';
+          relocate();
+          setTimeout(() => img.classList.remove('zapped'), 1450);
+        }, 520);
       });
 
       setTimeout(() => { img.style.opacity = '0'; }, 6000);
@@ -623,6 +970,53 @@
     }
     scheduleChaos();
 
+    // small, unrelated "anomaly" glitch flash — independent of the big chaos-spin
+    function scheduleGlitchAnomaly() {
+      const delay = 20000 + Math.random() * 15000;
+      setTimeout(() => {
+        document.body.classList.add('glitch-anomaly');
+        setTimeout(() => document.body.classList.remove('glitch-anomaly'), 400);
+        scheduleGlitchAnomaly();
+      }, delay);
+    }
+    scheduleGlitchAnomaly();
+
+    // hidden easter egg: click the spinning peace sign 5x quickly for a kaleidoscope burst
+    const psychBg = document.getElementById('psych-bg');
+    const peaceSign = document.querySelector('.peace');
+    let peaceClicks = 0;
+    let peaceClickTimer = null;
+    peaceSign.style.cursor = 'pointer';
+    peaceSign.addEventListener('click', () => {
+      peaceClicks++;
+      clearTimeout(peaceClickTimer);
+      peaceClickTimer = setTimeout(() => { peaceClicks = 0; }, 2000);
+      if (peaceClicks >= 5) {
+        peaceClicks = 0;
+        psychBg.classList.add('burst');
+        if (typeof showAchievement === 'function') showAchievement('Kaleidoskop-Ausbruch 🌀🔮');
+        const burstEmojis = ['🌀', '🔮', '💫', '🎆', '🌈'];
+        for (let i = 0; i < 24; i++) {
+          const el = document.createElement('span');
+          el.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+          const angle = (i / 24) * Math.PI * 2;
+          el.style.cssText = `
+            position: fixed; left: 50%; top: 50%; font-size: ${20 + Math.random() * 26}px;
+            z-index: 99996; pointer-events: none; transform: translate(-50%, -50%);
+            transition: transform 1.6s cubic-bezier(.15,.7,.3,1), opacity 1.6s ease;
+          `;
+          document.body.appendChild(el);
+          requestAnimationFrame(() => {
+            const dist = 250 + Math.random() * 200;
+            el.style.transform = `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px)) rotate(${Math.random() * 720 - 360}deg)`;
+            el.style.opacity = '0';
+          });
+          setTimeout(() => el.remove(), 1650);
+        }
+        setTimeout(() => psychBg.classList.remove('burst'), 4000);
+      }
+    });
+
     // floating meme images drifting through the background
     const memeImages = [
       'images/meme-suffer-in-silence.png',
@@ -631,11 +1025,15 @@
       'images/meme-kanye-bound2.jpeg',
       'images/meme-kanye-face.gif',
       'images/ram-dass.png',
+      'images/meme-organist-what-i-do.jpg',
+      'images/meme-feelings-of-power.png',
+      'images/meme-pastor-off.jpg',
+      'images/meme-bach-fugue-duck.jpeg',
     ];
     const activeMemes = [];
     const MEME_SIZE = 180;
-    const MEME_LIFE = 8800; // 20% faster than the original 11000ms
-    const MEME_FADE = 1200;
+    const MEME_LIFE = 12320; // 40% longer than the previous 8800ms
+    const MEME_FADE = 1680; // 40% longer than the previous 1200ms
 
     function spawnMeme() {
       const el = document.createElement('div');
@@ -643,7 +1041,6 @@
       const img = document.createElement('img');
       img.src = memeImages[Math.floor(Math.random() * memeImages.length)];
       el.appendChild(img);
-      el.addEventListener('click', () => showAchievement('Meme angeklickt 🖱️'));
       document.body.appendChild(el);
 
       const state = {
@@ -658,6 +1055,15 @@
       el.style.top = state.y + 'px';
       requestAnimationFrame(() => { el.style.opacity = '0.85'; });
       activeMemes.push(state);
+
+      el.addEventListener('click', () => {
+        if (el.classList.contains('popping')) return;
+        el.classList.add('popping');
+        showAchievement('Meme angeklickt 🖱️');
+        const i = activeMemes.indexOf(state);
+        if (i !== -1) activeMemes.splice(i, 1);
+        setTimeout(() => el.remove(), 520);
+      });
 
       setTimeout(() => { el.style.opacity = '0'; }, MEME_LIFE);
       setTimeout(() => {
@@ -703,6 +1109,7 @@
       'Comic Sans akzeptiert 💀',
       'Kekse konsumiert 🍪',
       'Ernsthaftigkeit verweigert 🙅',
+      'Jahreslosung 2026: "Yeet!" 📖',
     ];
     let achievementIndex = 0;
     function showAchievement(text) {
